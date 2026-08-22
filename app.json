@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "RideTrack",
+    "slug": "ridetrack",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "ridetrack",
+    "userInterfaceStyle": "light",
+    "plugins": ["expo-router"],
+    "ios": { "supportsTablet": true },
+    "android": { "adaptiveIcon": { "backgroundColor": "#0E3B43" } }
+  }
+}
