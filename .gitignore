@@ -38,3 +38,7 @@ ios/
 coverage/
 .cache/
 .tmp/
+
+# Local backend database
+backend/data/*.db
+backend/data/*.db-*

@@ -1,15 +1,22 @@
 import React, { useState } from 'react';
-import { Button, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Button, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import AuthHeader from '../../components/Auth/AuthHeader';
 import AuthInput from '../../components/Auth/AuthInput';
+import { useAuthStore } from '../../store/useAuthStore';
 
 export default function SignInScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { login, isLoading } = useAuthStore();
 
-  const handleSignIn = () => {
-    console.log('Sign in payload', { email, password });
+  const handleSignIn = async () => {
+    const success = await login(email, password);
+
+    if (!success) {
+      Alert.alert('Sign in failed', useAuthStore.getState().error || 'Unable to sign in.');
+    }
   };
 
   return (
@@ -24,7 +31,8 @@ export default function SignInScreen({ navigation }) {
           onChangeText={setPassword}
           secureTextEntry
         />
-        <Button title="Sign In" onPress={handleSignIn} />
+        {isLoading ? <ActivityIndicator style={styles.loading} /> : null}
+        <Button title="Sign In" onPress={handleSignIn} disabled={isLoading} />
         <Text style={styles.link} onPress={() => navigation.navigate('SignUp')}>
           Need an account? Sign up
         </Text>
@@ -48,5 +56,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#2563eb',
     fontWeight: '600',
+  },
+  loading: {
+    marginBottom: 12,
   },
 });

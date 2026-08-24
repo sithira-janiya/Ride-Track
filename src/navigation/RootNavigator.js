@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { useSelector } from 'react-redux';
+
 import AuthNavigator from './AuthNavigator';
 import MainNavigator from './MainNavigator';
+import { useAuthStore } from '../store/useAuthStore';
 
 export default function RootNavigator() {
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const { isAuthenticated, hydrate } = useAuthStore();
+
+  useEffect(() => {
+    hydrate();
+  }, [hydrate]);
 
   return (
     <NavigationContainer>
