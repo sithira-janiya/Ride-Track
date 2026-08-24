@@ -1,10 +1,13 @@
 import * as SecureStore from 'expo-secure-store';
+import { ClientResponseError } from 'pocketbase';
+import { pocketBase } from './pocketBase';
 
 export type AuthUser = {
   id: string;
   fullName: string;
   email: string;
   mobile: string;
+  role: string;
   createdAt: string;
 };
 
@@ -15,47 +18,49 @@ type AuthSession = {
 
 const TOKEN_KEY = 'ridetrack_auth_token';
 const USER_KEY = 'ridetrack_auth_user';
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:4000';
-
 const normalizeIdentifier = (value: string) => value.trim();
 
 const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 
 const isValidMobile = (value: string) => /^\+?[0-9]{9,15}$/.test(value.trim());
 
-type AuthResponse = {
-  message?: string;
-  user?: AuthUser;
-  token?: string;
+type PocketBaseUser = {
+  id: string;
+  name: string;
+  email: string;
+  username: string;
+  mobile: string;
+  role: string;
+  created: string;
 };
 
-async function requestAuth(path: string, body: Record<string, string>): Promise<AuthSession> {
-  let response: Response;
+const toAuthUser = (user: PocketBaseUser): AuthUser => ({
+  id: user.id,
+  fullName: user.name,
+  email: user.email,
+  mobile: user.mobile || user.username,
+  role: user.role,
+  createdAt: user.created,
+});
 
+const messageForError = (error: unknown): string => {
+  if (error instanceof ClientResponseError) {
+    if (error.status === 0) return 'Unable to reach PocketBase. Check EXPO_PUBLIC_POCKETBASE_URL and try again.';
+    return error.response?.message || error.message || 'Authentication failed.';
+  }
+
+  return error instanceof Error ? error.message : 'Authentication failed.';
+};
+
+async function authenticate(identifier: string, password: string): Promise<AuthSession> {
   try {
-    response = await fetch(`${API_URL}/api/auth/${path}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+    const auth = await pocketBase.collection('users').authWithPassword<PocketBaseUser>(identifier, password);
+    const user = toAuthUser(auth.record);
+    await saveAuthSession(user, auth.token);
+    return { user, token: auth.token };
   } catch (error) {
-    throw new Error(`Unable to reach the RideTrack server at ${API_URL}. Start the backend and try again.`);
+    throw new Error(messageForError(error));
   }
-
-  let payload: AuthResponse;
-
-  try {
-    payload = (await response.json()) as AuthResponse;
-  } catch (error) {
-    throw new Error('The RideTrack server returned an invalid response.');
-  }
-
-  if (!response.ok || !payload.user || !payload.token) {
-    throw new Error(payload.message || 'Authentication failed.');
-  }
-
-  await saveAuthSession(payload.user, payload.token);
-  return { user: payload.user, token: payload.token };
 }
 
 export async function saveAuthSession(user: AuthUser, token: string): Promise<void> {
@@ -101,19 +106,21 @@ export async function login(identifier: string, password: string): Promise<AuthS
     throw new Error('Please enter a valid email address or mobile number.');
   }
 
-  return requestAuth('login', { identifier: emailOrMobile, password: securePassword });
+  return authenticate(emailOrMobile, securePassword);
 }
 
 export async function register(
   fullName: string,
   email: string,
   mobile: string,
-  password: string
+  password: string,
+  role: string
 ): Promise<AuthSession> {
   const cleanedFullName = fullName.trim();
   const cleanedEmail = email.trim();
   const cleanedMobile = mobile.trim();
   const cleanedPassword = password.trim();
+  const cleanedRole = role.trim();
 
   if (!cleanedFullName) {
     throw new Error('Full name is required.');
@@ -131,10 +138,23 @@ export async function register(
     throw new Error('Password must be at least 6 characters long.');
   }
 
-  return requestAuth('register', {
-    fullName: cleanedFullName,
-    email: cleanedEmail,
-    mobile: cleanedMobile,
-    password: cleanedPassword,
-  });
+  if (!cleanedRole) {
+    throw new Error('Please select a role.');
+  }
+
+  try {
+    await pocketBase.collection('users').create({
+      name: cleanedFullName,
+      email: cleanedEmail,
+      username: cleanedMobile,
+      mobile: cleanedMobile,
+      password: cleanedPassword,
+      passwordConfirm: cleanedPassword,
+      role: cleanedRole,
+    });
+  } catch (error) {
+    throw new Error(messageForError(error));
+  }
+
+  return authenticate(cleanedEmail, cleanedPassword);
 }

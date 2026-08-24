@@ -39,6 +39,7 @@ coverage/
 .cache/
 .tmp/
 
-# Local backend database
-backend/data/*.db
-backend/data/*.db-*
+# PocketBase runtime data
+pocketbase/pb_data/
+pocketbase/pocketbase
+pocketbase/pocketbase.exe

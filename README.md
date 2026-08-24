@@ -1,6 +1,6 @@
 # RideTrack
 
-RideTrack is a modular Expo + React Native app for a bus-tracking and commuter experience. Account registration uses a local Express API and SQLite database, while the mobile app stores the returned session securely with Expo SecureStore.
+RideTrack is a modular Expo + React Native app for a bus-tracking and commuter experience. Account registration and authentication use a local PocketBase backend, while the mobile app stores the returned session securely with Expo SecureStore.
 
 ## Current status
 
@@ -11,10 +11,10 @@ RideTrack is a modular Expo + React Native app for a bus-tracking and commuter e
 - Responsive RideTrack landing page
 - Zustand authentication state with SecureStore session persistence
 - Working account creation form with validation and loading/error states
-- Express registration and login API with SQLite user persistence and bcrypt password hashing
+- Registration and login API using PocketBase user persistence and authentication
 - Login with email or mobile number and invalid-credential handling
 - Duplicate email and mobile number protection
-- Backend health endpoint at `GET /api/health`
+- Backend health checks via PocketBase
 
 ### In progress
 
@@ -23,11 +23,11 @@ RideTrack is a modular Expo + React Native app for a bus-tracking and commuter e
 - Bus search, routes, schedules, and ETA calculations
 - Tickets, profiles, travel history, and notifications
 
-The registration and login flows are functional when the backend is running. The backend database is created automatically at `backend/data/ridetrack.db` and is excluded from Git.
+The registration and login flows are functional when the PocketBase backend is running.
 
 ## Project structure
 
-- `backend` contains the local Express API and SQLite database setup.
+- `pocketbase` contains the PocketBase executable and backend database instructions.
 - `src/actions` contains legacy Redux action creators retained for reference.
 - `src/components` stores reusable UI building blocks.
 - `src/constants` centralizes colors, spacing, typography, and app config.
@@ -43,29 +43,21 @@ The registration and login flows are functional when the backend is running. The
 npm install
 ```
 
-Start the backend and Expo together:
+Start PocketBase backend in a separate terminal from the `pocketbase` directory:
+
+```bash
+cd pocketbase
+./pocketbase serve
+```
+*(Windows: `./pocketbase.exe serve`)*
+
+Start Expo:
 
 ```bash
 npm start
 ```
 
 For tunnel mode with a clean Metro cache:
-
-```bash
-npm run start:tunnel
-```
-
-This single command starts the backend, creates a public API tunnel for port `4000`, injects that API URL into Expo, and starts the Expo native app tunnel. The API creates `backend/data/ridetrack.db` automatically. Keep this terminal open while testing.
-
-The command uses LocalTunnel, so an internet connection is required. It prints the public API URL before starting Expo. No `EXPO_PUBLIC_API_URL` or Windows Firewall configuration is required for this tunnel workflow.
-
-Check the backend separately with:
-
-```bash
-curl http://localhost:4000/api/health
-```
-
-For tunnel mode and a clean cache:
 
 ```bash
 npm run start:tunnel

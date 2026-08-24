@@ -16,7 +16,7 @@ type AuthState = {
   error: string | null;
   hydrate: () => Promise<void>;
   login: (identifier: string, password: string) => Promise<boolean>;
-  register: (fullName: string, email: string, mobile: string, password: string) => Promise<boolean>;
+  register: (fullName: string, email: string, mobile: string, password: string, role: string) => Promise<boolean>;
   logout: () => Promise<void>;
   clearError: () => void;
 };
@@ -73,11 +73,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  register: async (fullName: string, email: string, mobile: string, password: string) => {
+  register: async (fullName: string, email: string, mobile: string, password: string, role: string) => {
     set({ isLoading: true, error: null });
 
     try {
-      const session = await registerRequest(fullName, email, mobile, password);
+      const session = await registerRequest(fullName, email, mobile, password, role);
 
       set({
         user: session.user,

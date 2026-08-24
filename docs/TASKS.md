@@ -12,8 +12,8 @@
 
 - [x] Navigation setup (React Navigation v6 / Expo Router)
 - [x] Global state management setup (Zustand or Redux Toolkit)
-- [x] Authentication system (registration API with SQLite persistence and SecureStore session)
-- [x] Create Account button integrated with backend registration endpoint
+- [x] Authentication system (PocketBase auth collection setup and SecureStore session)
+- [x] Create Account button integrated with PocketBase registration
 - [x] API integration strategy & Axios instance creation
 - [x] Code review & merging PRs from members
 

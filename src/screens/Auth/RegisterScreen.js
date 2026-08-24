@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Button, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Button, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import AuthHeader from '../../components/Auth/AuthHeader';
 import AuthInput from '../../components/Auth/AuthInput';
 import { useAuthStore } from '../../store/useAuthStore';
 
-export default function SignUpScreen({ navigation }) {
+export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [mobile, setMobile] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState('passenger'); // default role
   const { register, isLoading, error } = useAuthStore();
 
   const handleSignUp = async () => {
@@ -20,7 +21,7 @@ export default function SignUpScreen({ navigation }) {
       return;
     }
 
-    const success = await register(name, email, mobile, password);
+    const success = await register(name, email, mobile, password, role);
 
     if (!success) {
       Alert.alert('Registration failed', useAuthStore.getState().error || error || 'Unable to create your account.');
@@ -48,9 +49,25 @@ export default function SignUpScreen({ navigation }) {
           onChangeText={setConfirmPassword}
           secureTextEntry
         />
+        
+        <Text style={styles.roleLabel}>Select your role</Text>
+        <View style={styles.roleContainer}>
+          {['passenger', 'driver', 'conductor'].map((r) => (
+            <TouchableOpacity
+              key={r}
+              style={[styles.roleButton, role === r && styles.roleButtonActive]}
+              onPress={() => setRole(r)}
+            >
+              <Text style={[styles.roleButtonText, role === r && styles.roleButtonTextActive]}>
+                {r.charAt(0).toUpperCase() + r.slice(1)}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
         {isLoading ? <ActivityIndicator style={styles.loading} /> : null}
         <Button title="Create Account" onPress={handleSignUp} disabled={isLoading} />
-        <Text style={styles.link} onPress={() => navigation.navigate('SignIn')}>
+        <Text style={styles.link} onPress={() => navigation.navigate('Login')}>
           Already have an account? Sign in
         </Text>
       </View>
@@ -76,5 +93,39 @@ const styles = StyleSheet.create({
   },
   loading: {
     marginBottom: 12,
+  },
+  roleLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 8,
+    marginTop: 10,
+  },
+  roleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  roleButton: {
+    flex: 1,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 8,
+    marginHorizontal: 4,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  roleButtonActive: {
+    backgroundColor: '#2563eb',
+    borderColor: '#2563eb',
+  },
+  roleButtonText: {
+    fontSize: 14,
+    color: '#4b5563',
+    fontWeight: '500',
+  },
+  roleButtonTextActive: {
+    color: '#fff',
   },
 });

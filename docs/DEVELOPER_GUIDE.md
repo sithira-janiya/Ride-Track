@@ -15,7 +15,7 @@ RideTrack is a React Native mobile application built with Expo SDK 54 for public
 - Optional map libraries such as react-native-maps or Mapbox
 - AsyncStorage or MMKV for local persistence
 - Expo Notifications for alerts and arrival reminders
-- Express + SQLite + bcryptjs for the local account API
+- PocketBase for the backend API and user authentication
 
 ### App goals
 
@@ -72,7 +72,7 @@ For tunnel mode with a clean Metro cache, use:
 npm run start:tunnel
 ```
 
-This command runs `backend/start-tunnel.js`. It starts the API, waits for `GET /api/health`, creates a LocalTunnel URL for port `4000`, passes that URL as `EXPO_PUBLIC_API_URL`, and then starts Expo tunnel mode. Keep the terminal open while using Expo Go. An internet connection is required.
+This starts Expo in tunnel mode. Keep the terminal open while using Expo Go. An internet connection is required. To test authentication, PocketBase must be running (see `pocketbase/README.md`).
 
 To start Expo by itself, use:
 
@@ -183,9 +183,9 @@ Examples:
 
 Keep service logic separate from UI code to avoid bloated screens.
 
-### `backend/`
+### `pocketbase/`
 
-Contains the local development API. `backend/server.js` exposes `POST /api/auth/register`, `POST /api/auth/login`, and `GET /api/health`. Registration validates the payload, rejects duplicate email or mobile values, hashes passwords with bcryptjs, and saves users in SQLite at `backend/data/ridetrack.db`. Login verifies the stored password hash and supports email or mobile identifiers. Passwords are never returned to the mobile app. The generated database files are ignored by Git.
+Contains the PocketBase executable and local database instructions. This acts as the local development API and user authentication service. PocketBase manages password hashing, tokens, and stores user data in the `pb_data` directory. The generated database files (`pb_data/`) are ignored by Git.
 
 ### `src/hooks/`
 

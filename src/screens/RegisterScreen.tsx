@@ -29,6 +29,7 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
   const [mobile, setMobile] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState('passenger');
 
   const handleRegister = async () => {
     clearError();
@@ -58,7 +59,7 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
       return;
     }
 
-    const success = await register(fullName, email, mobile, password);
+    const success = await register(fullName, email, mobile, password, role);
 
     if (!success) {
       Alert.alert('Registration failed', error ?? 'Unable to create your account.');
@@ -126,6 +127,21 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
               value={confirmPassword}
               onChangeText={setConfirmPassword}
             />
+
+            <Text style={styles.label}>Select your role</Text>
+            <View style={styles.roleContainer}>
+              {['passenger', 'driver', 'conductor'].map((r) => (
+                <TouchableOpacity
+                  key={r}
+                  style={[styles.roleButton, role === r && styles.roleButtonActive]}
+                  onPress={() => setRole(r)}
+                >
+                  <Text style={[styles.roleButtonText, role === r && styles.roleButtonTextActive]}>
+                    {r.charAt(0).toUpperCase() + r.slice(1)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
 
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
@@ -250,5 +266,32 @@ const styles = StyleSheet.create({
     color: '#2563eb',
     fontWeight: '700',
     fontSize: 14,
+  },
+  roleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  roleButton: {
+    flex: 1,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    borderRadius: 8,
+    marginHorizontal: 4,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  roleButtonActive: {
+    backgroundColor: '#0f172a',
+    borderColor: '#0f172a',
+  },
+  roleButtonText: {
+    fontSize: 14,
+    color: '#475569',
+    fontWeight: '600',
+  },
+  roleButtonTextActive: {
+    color: '#fff',
   },
 });

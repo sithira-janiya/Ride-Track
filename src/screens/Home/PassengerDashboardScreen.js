@@ -2,12 +2,12 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function HomeScreen() {
+export default function PassengerDashboardScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Home</Text>
-        <Text style={styles.subtitle}>Your ride dashboard will live here.</Text>
+        <Text style={styles.title}>Passenger Dashboard</Text>
+        <Text style={styles.subtitle}>Find and track your rides here.</Text>
       </View>
     </SafeAreaView>
   );
