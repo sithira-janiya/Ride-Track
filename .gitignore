@@ -1,45 +1,40 @@
-# Node modules
+# Node / Expo
 node_modules/
+.expo/
+.expo-shared/
+.expo-dev-client/
+web-build/
+dist/
+build/
+
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
 
-# Expo / React Native build artifacts & directories
-.expo/
-dist/
-web-build/
-ios/
-android/
-
-# Native build folders (if using prebuild or bare workflow)
-*.ipa
-*.apk
-*.aab
-*.app
-
-# Metro bundler cache
-.metro-cache/
-metro-cache/
-
-# Local environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# IDE and Editor files (VS Code, Xcode, Android Studio)
-.idea/
-.vscode/
-*.swp
-*.swo
+# OS
 .DS_Store
 Thumbs.db
 
-# TypeScript compilation output
-*.tsbuildinfo
+# Environment
+.env
+.env.*
 
-# Testing and Coverage reports
+# IDE/editor files
+.vscode/
+.idea/
+.claude/
+*.swp
+*.swo
+
+# Generated project artifacts
+Errors/
+
+# Native builds
+android/
+ios/
+
+# Bundles / caches
 coverage/
-.nyc_output/
+.cache/
+.tmp/
