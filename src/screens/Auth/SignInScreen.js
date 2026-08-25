@@ -1,187 +1,43 @@
 import React, { useState } from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  TouchableOpacity,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  Dimensions,
-} from 'react-native';
-import { useDispatch } from 'react-redux';
-import { signInSuccess } from '../../reducers/Auth/authReducers';
-import COLORS from '../../constants/colors';
+import { ActivityIndicator, Alert, Button, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-// ── Pixel 6 baseline: 412 × 915 dp ──────────────────────────────────────────
-const { width: W, height: H } = Dimensions.get('window');
-const BASE_W = 412;
-const BASE_H = 915;
-// Scale a horizontal value relative to Pixel 6 width
-const sw = (val) => (W / BASE_W) * val;
-// Scale a vertical value relative to Pixel 6 height
-const sh = (val) => (H / BASE_H) * val;
-// Clamp to avoid going too large on tablets
-const rs = (val) => Math.min(sw(val), val * 1.15);
+import AuthHeader from '../../components/Auth/AuthHeader';
+import AuthInput from '../../components/Auth/AuthInput';
+import { useAuthStore } from '../../store/useAuthStore';
 
 export default function SignInScreen({ navigation }) {
   const dispatch = useDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [emailFocused, setEmailFocused] = useState(false);
-  const [passwordFocused, setPasswordFocused] = useState(false);
-  const [secureText, setSecureText] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const { login, isLoading } = useAuthStore();
 
   const handleSignIn = async () => {
-    if (!email || !password) {
-      setError('Please fill in all fields.');
-      return;
-    }
-    setError('');
-    setLoading(true);
+    const success = await login(email, password);
 
-    // TODO: Replace with real PocketBase auth call
-    setTimeout(() => {
-      setLoading(false);
-      dispatch(signInSuccess({ email }));
-    }, 1200);
+    if (!success) {
+      Alert.alert('Sign in failed', useAuthStore.getState().error || 'Unable to sign in.');
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          {/* ── Brand Mark ── */}
-          <View style={styles.brandRow}>
-            <View style={styles.brandIcon}>
-              <Text style={styles.brandIconText}>🚌</Text>
-            </View>
-            <Text style={styles.brandName}>RideTrack</Text>
-          </View>
-
-          {/* ── Headline ── */}
-          <View style={styles.headlineBlock}>
-            <Text style={styles.headline}>Welcome back</Text>
-            <Text style={styles.subheadline}>
-              Sign in to track your rides, passes, and journeys.
-            </Text>
-          </View>
-
-          {/* ── Form Card ── */}
-          <View style={styles.formCard}>
-            {/* Email */}
-            <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Email address</Text>
-              <View style={[styles.inputWrap, emailFocused && styles.inputWrapFocused]}>
-                <Text style={styles.inputIcon}>✉️</Text>
-                <TextInput
-                  style={styles.input}
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder="you@example.com"
-                  placeholderTextColor={COLORS.textMuted}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  onFocus={() => setEmailFocused(true)}
-                  onBlur={() => setEmailFocused(false)}
-                />
-              </View>
-            </View>
-
-            {/* Password */}
-            <View style={styles.fieldGroup}>
-              <View style={styles.labelRow}>
-                <Text style={styles.label}>Password</Text>
-                <TouchableOpacity onPress={() => {}}>
-                  <Text style={styles.forgotText}>Forgot password?</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={[styles.inputWrap, passwordFocused && styles.inputWrapFocused]}>
-                <Text style={styles.inputIcon}>🔒</Text>
-                <TextInput
-                  style={styles.input}
-                  value={password}
-                  onChangeText={setPassword}
-                  placeholder="Enter your password"
-                  placeholderTextColor={COLORS.textMuted}
-                  secureTextEntry={secureText}
-                  onFocus={() => setPasswordFocused(true)}
-                  onBlur={() => setPasswordFocused(false)}
-                />
-                <TouchableOpacity onPress={() => setSecureText(!secureText)} style={styles.eyeBtn}>
-                  <Text style={styles.eyeIcon}>{secureText ? '👁️' : '🙈'}</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Error */}
-            {error ? (
-              <View style={styles.errorBox}>
-                <Text style={styles.errorText}>⚠️  {error}</Text>
-              </View>
-            ) : null}
-
-            {/* Sign In Button */}
-            <TouchableOpacity
-              style={[styles.signInBtn, loading && styles.signInBtnDisabled]}
-              onPress={handleSignIn}
-              activeOpacity={0.85}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color={COLORS.textOnAccent} />
-              ) : (
-                <Text style={styles.signInBtnText}>Sign In →</Text>
-              )}
-            </TouchableOpacity>
-
-            {/* Divider */}
-            <View style={styles.dividerRow}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or continue with</Text>
-              <View style={styles.dividerLine} />
-            </View>
-
-            {/* Social Buttons */}
-            <View style={styles.socialRow}>
-              <TouchableOpacity style={styles.socialBtn} activeOpacity={0.8}>
-                <Text style={styles.socialBtnText}>G  Google</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.socialBtn} activeOpacity={0.8}>
-                <Text style={styles.socialBtnText}>📱  Phone</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* ── Footer ── */}
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-              <Text style={styles.footerLink}>Sign up free</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* ── Terms ── */}
-          <Text style={styles.terms}>
-            By signing in you agree to our{' '}
-            <Text style={styles.termsLink}>Terms of Service</Text> &{' '}
-            <Text style={styles.termsLink}>Privacy Policy</Text>
-          </Text>
-        </ScrollView>
-      </KeyboardAvoidingView>
+      <View style={styles.content}>
+        <AuthHeader title="Welcome back" subtitle="Sign in to keep your rides in sync." />
+        <AuthInput label="Email" placeholder="you@example.com" value={email} onChangeText={setEmail} />
+        <AuthInput
+          label="Password"
+          placeholder="Enter your password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+        {isLoading ? <ActivityIndicator style={styles.loading} /> : null}
+        <Button title="Sign In" onPress={handleSignIn} disabled={isLoading} />
+        <Text style={styles.link} onPress={() => navigation.navigate('SignUp')}>
+          Need an account? Sign up
+        </Text>
+      </View>
     </SafeAreaView>
   );
 }
@@ -377,5 +233,8 @@ const styles = StyleSheet.create({
   termsLink: {
     color: COLORS.accent,
     fontWeight: '600',
+  },
+  loading: {
+    marginBottom: 12,
   },
 });

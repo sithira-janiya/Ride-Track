@@ -10,11 +10,12 @@
 
 ### Member 1: Sithira (Team Leader / Core Architecture & Backend Integration)
 
-- [ ] Navigation setup (React Navigation v6 / Expo Router)
-- [ ] Global state management setup (Zustand or Redux Toolkit)
-- [ ] Authentication system (Login/Register with JWT or Firebase)
-- [ ] API integration strategy & Axios instance creation
-- [ ] Code review & merging PRs from members
+- [x] Navigation setup (React Navigation v6 / Expo Router)
+- [x] Global state management setup (Zustand or Redux Toolkit)
+- [x] Authentication system (registration API with SQLite persistence and SecureStore session)
+- [x] Create Account button integrated with backend registration endpoint
+- [x] API integration strategy & Axios instance creation
+- [x] Code review & merging PRs from members
 
 ### Member 2: Kaveen (Maps, Location Services & Live Bus Tracking)
 
@@ -44,17 +45,17 @@
 
 ### Overall Progress
 
-- [ ] Sprint planning and kickoff
-- [ ] Architecture, setup, and foundation complete
-- [ ] Core features in development
+- [x] Sprint planning and kickoff
+- [x] Architecture, setup, and foundation complete
+- [x] Core features in development
 - [ ] Testing and QA review
 - [ ] Final release preparation
 
 ### Completion Estimate
 
-- Overall project completion target: 0%
-- Current sprint completion: 0%
-- Remaining tasks: 100%
+- Overall project completion target: 45%
+- Current sprint completion: 50%
+- Remaining tasks: 50%
 
 ### Target Timeline
 
@@ -66,7 +67,7 @@
 
 ### Team Status Summary
 
-- Sithira: 0% complete
+- Sithira: 100% complete
 - Kaveen: 0% complete
 - Geethma: 0% complete
 - Lakeesha: 0% complete
