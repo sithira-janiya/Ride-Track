@@ -15,6 +15,7 @@ RideTrack is a React Native mobile application built with Expo SDK 54 for public
 - Optional map libraries such as react-native-maps or Mapbox
 - AsyncStorage or MMKV for local persistence
 - Expo Notifications for alerts and arrival reminders
+- Express + SQLite + bcryptjs for the local account API
 
 ### App goals
 
@@ -59,7 +60,21 @@ npm install
 
 ### Run the app locally
 
-Start the Expo development server:
+Start the account API and Expo together from the project root:
+
+```bash
+npm start
+```
+
+For tunnel mode with a clean Metro cache, use:
+
+```bash
+npm run start:tunnel
+```
+
+This command runs `backend/start-tunnel.js`. It starts the API, waits for `GET /api/health`, creates a LocalTunnel URL for port `4000`, passes that URL as `EXPO_PUBLIC_API_URL`, and then starts Expo tunnel mode. Keep the terminal open while using Expo Go. An internet connection is required.
+
+To start Expo by itself, use:
 
 ```bash
 npx expo start
@@ -76,6 +91,8 @@ For tunnel mode (useful when testing over network or remote devices):
 ```bash
 npx expo start --tunnel -c
 ```
+
+The mobile app uses the injected public API URL during `npm run start:tunnel`, so a physical phone does not try to call its own `localhost`. For local web or emulator development, the service defaults to `http://localhost:4000`; set `EXPO_PUBLIC_API_URL` manually when using another host.
 
 ### Test using Expo Go
 
@@ -165,6 +182,10 @@ Examples:
 - ticket or trip data fetching
 
 Keep service logic separate from UI code to avoid bloated screens.
+
+### `backend/`
+
+Contains the local development API. `backend/server.js` exposes `POST /api/auth/register`, `POST /api/auth/login`, and `GET /api/health`. Registration validates the payload, rejects duplicate email or mobile values, hashes passwords with bcryptjs, and saves users in SQLite at `backend/data/ridetrack.db`. Login verifies the stored password hash and supports email or mobile identifiers. Passwords are never returned to the mobile app. The generated database files are ignored by Git.
 
 ### `src/hooks/`
 
